@@ -8,8 +8,9 @@ export function createClient(): ExtendedClient {
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
       GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildMessageReactions,
     ],
-    partials: [Partials.Channel, Partials.Message, Partials.User],
+    partials: [Partials.Channel, Partials.Message, Partials.User, Partials.Reaction],
   }) as ExtendedClient;
 
   client.commands = new Collection();

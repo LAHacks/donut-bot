@@ -23,6 +23,12 @@ GUILD_ID=your_guild_id  # optional
 
 ## Run
 
+First time setup:
+```bash
+pnpm run register
+```
+
+Then start dev server with hot reload:
 ```bash
 pnpm run dev
 ```

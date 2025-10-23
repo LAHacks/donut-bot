@@ -7,6 +7,7 @@ const command: Command = {
     .setDescription('Replies with Pong!'),
 
   async execute(interaction: ChatInputCommandInteraction) {
+    console.log("hi")
     const sent = await interaction.reply({
       content: 'Pinging...',
       fetchReply: true,

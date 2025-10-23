@@ -7,13 +7,12 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsc && node dist/scripts/register-commands.js && node dist/index.js",
-    "watch": "tsc --watch",
+    "dev": "tsx --watch src/index.ts",
+    "register": "tsx src/scripts/register-commands.ts",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --check \"src/**/*.ts\"",
-    "format:fix": "prettier --write \"src/**/*.ts\"",
-    "commands:register": "node dist/scripts/register-commands.js"
+    "format:fix": "prettier --write \"src/**/*.ts\""
   },
   "keywords": [
     "discord",
@@ -33,6 +32,7 @@
     "@typescript-eslint/parser": "^8.18.2",
     "eslint": "^9.17.0",
     "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
   "engines": {
