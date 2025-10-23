@@ -8,6 +8,9 @@ dist/
 # Environment variables
 .env
 
+# Data files
+data/
+
 # Logs
 *.log
 logs/

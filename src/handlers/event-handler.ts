@@ -1,6 +1,7 @@
 import { Events } from 'discord.js';
 import { ExtendedClient } from '../types/client.js';
 import { handleInteraction } from './interaction-handler.js';
+import { handleMessage } from './message-handler.js';
 
 export function registerEventHandlers(client: ExtendedClient): void {
   // Ready event
@@ -11,6 +12,11 @@ export function registerEventHandlers(client: ExtendedClient): void {
   // Interaction create event
   client.on(Events.InteractionCreate, async interaction => {
     await handleInteraction(interaction);
+  });
+
+  // Message create event
+  client.on(Events.MessageCreate, async message => {
+    await handleMessage(message);
   });
 
   // Error handling

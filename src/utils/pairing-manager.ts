@@ -5,9 +5,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+interface WeeklyPairing {
+  pairs: [string, string][];
+  weekId: string;
+  timestamp: number;
+}
+
 interface PairingHistory {
   [guildId: string]: {
-    [userId: string]: string[]; // userId -> array of user IDs they've been paired with
+    allTimePairs: {
+      [userId: string]: string[]; // userId -> array of user IDs they've been paired with
+    };
+    weeklyPairings: WeeklyPairing[];
   };
 }
 
@@ -44,30 +53,75 @@ export class PairingManager {
     }
   }
 
+  private getWeekId(date: Date = new Date()): string {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    return `${date.getFullYear()}-W${weekNum.toString().padStart(2, '0')}`;
+  }
+
   hasPairedBefore(guildId: string, userId1: string, userId2: string): boolean {
     if (!this.history[guildId]) return false;
-    if (!this.history[guildId][userId1]) return false;
-    return this.history[guildId][userId1].includes(userId2);
+    if (!this.history[guildId].allTimePairs) return false;
+    if (!this.history[guildId].allTimePairs[userId1]) return false;
+    return this.history[guildId].allTimePairs[userId1].includes(userId2);
+  }
+
+  getCurrentWeekPairing(guildId: string, userId: string): string | null {
+    if (!this.history[guildId]) return null;
+    if (!this.history[guildId].weeklyPairings) return null;
+
+    const currentWeek = this.getWeekId();
+    const weeklyPairing = this.history[guildId].weeklyPairings.find(
+      wp => wp.weekId === currentWeek
+    );
+
+    if (!weeklyPairing) return null;
+
+    for (const [user1, user2] of weeklyPairing.pairs) {
+      if (user1 === userId) return user2;
+      if (user2 === userId) return user1;
+    }
+
+    return null;
+  }
+
+  areCurrentWeekPartners(guildId: string, userId1: string, userId2: string): boolean {
+    if (!this.history[guildId]) return false;
+    if (!this.history[guildId].weeklyPairings) return false;
+
+    const currentWeek = this.getWeekId();
+    const weeklyPairing = this.history[guildId].weeklyPairings.find(
+      wp => wp.weekId === currentWeek
+    );
+
+    if (!weeklyPairing) return false;
+
+    const sorted = [userId1, userId2].sort();
+    return weeklyPairing.pairs.some(pair => {
+      const pairSorted = [pair[0], pair[1]].sort();
+      return pairSorted[0] === sorted[0] && pairSorted[1] === sorted[1];
+    });
   }
 
   recordPairing(guildId: string, userId1: string, userId2: string): void {
     if (!this.history[guildId]) {
-      this.history[guildId] = {};
+      this.history[guildId] = { allTimePairs: {}, weeklyPairings: [] };
     }
 
     // Record in both directions
-    if (!this.history[guildId][userId1]) {
-      this.history[guildId][userId1] = [];
+    if (!this.history[guildId].allTimePairs[userId1]) {
+      this.history[guildId].allTimePairs[userId1] = [];
     }
-    if (!this.history[guildId][userId2]) {
-      this.history[guildId][userId2] = [];
+    if (!this.history[guildId].allTimePairs[userId2]) {
+      this.history[guildId].allTimePairs[userId2] = [];
     }
 
-    if (!this.history[guildId][userId1].includes(userId2)) {
-      this.history[guildId][userId1].push(userId2);
+    if (!this.history[guildId].allTimePairs[userId1].includes(userId2)) {
+      this.history[guildId].allTimePairs[userId1].push(userId2);
     }
-    if (!this.history[guildId][userId2].includes(userId1)) {
-      this.history[guildId][userId2].push(userId1);
+    if (!this.history[guildId].allTimePairs[userId2].includes(userId1)) {
+      this.history[guildId].allTimePairs[userId2].push(userId1);
     }
 
     this.saveHistory();
@@ -121,9 +175,24 @@ export class PairingManager {
   }
 
   savePairings(guildId: string, pairs: [string, string][]): void {
+    if (!this.history[guildId]) {
+      this.history[guildId] = { allTimePairs: {}, weeklyPairings: [] };
+    }
+
+    // Save to all-time history
     for (const [userId1, userId2] of pairs) {
       this.recordPairing(guildId, userId1, userId2);
     }
+
+    // Save as this week's pairing
+    const currentWeek = this.getWeekId();
+    this.history[guildId].weeklyPairings.push({
+      pairs,
+      weekId: currentWeek,
+      timestamp: Date.now(),
+    });
+
+    this.saveHistory();
   }
 }
 
