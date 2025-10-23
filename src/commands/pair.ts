@@ -69,7 +69,7 @@ const command: Command = {
       // Create embed to show pairings
       const embed = new EmbedBuilder()
         .setColor(0xFFB6C1)
-        .setTitle('🍩 Donut Pairings!')
+        .setTitle('🍌 Donut Pairings!')
         .setDescription(
           'Here are this round\'s donut pairs! Each pair should schedule a time to chat over donuts (or coffee, or tea!).'
         )

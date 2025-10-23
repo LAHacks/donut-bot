@@ -2,7 +2,7 @@ import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits }
 import { Command } from '../types/command.js';
 
 const DONUT_ROLE_NAME = 'Donut';
-const REACTION_EMOJI = '🍩';
+const REACTION_EMOJI = '🍌';
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -39,7 +39,7 @@ const command: Command = {
       }
 
       const message = await channel.send({
-        content: `@everyone\n\n🍩 **Welcome to the Donut Pool!** 🍩\n\nReact with ${REACTION_EMOJI} to join the donut pool and get the ${donutRole} role!`,
+        content: `@everyone\n\n🍌 **Welcome to the Donut Pool!** 🍌\n\nReact with ${REACTION_EMOJI} to join the donut pool and get the ${donutRole} role! \n\n You'll be paired with someone to grab some food and hang out every week 🍌`,
         allowedMentions: { parse: ['everyone'] },
       });
 

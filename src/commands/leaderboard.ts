@@ -33,7 +33,7 @@ const command: Command = {
 
       const embed = new EmbedBuilder()
         .setColor(0xFFB6C1)
-        .setTitle('🍩 Donut Leaderboard')
+        .setTitle('🍌 Donut Leaderboard')
         .setDescription('Members ranked by total donut completions')
         .setTimestamp();
 
