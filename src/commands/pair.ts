@@ -75,15 +75,38 @@ const command: Command = {
         )
         .setTimestamp();
 
-      // Add pairs to embed
+      // Add pairs to embed (split into multiple fields if needed due to 1024 char limit)
+      const FIELD_CHAR_LIMIT = 1024;
       let pairsText = '';
+      let fieldIndex = 1;
+
       for (let i = 0; i < pairs.length; i++) {
         const [userId1, userId2] = pairs[i];
         const member1 = donutMembers.get(userId1);
         const member2 = donutMembers.get(userId2);
-        pairsText += `**Pair ${i + 1}:** ${member1} & ${member2}\n`;
+        const pairLine = `**Pair ${i + 1}:** ${member1} & ${member2}\n`;
+
+        // Check if adding this pair would exceed the limit
+        if (pairsText.length + pairLine.length > FIELD_CHAR_LIMIT) {
+          // Add current field and start a new one
+          embed.addFields({
+            name: fieldIndex === 1 ? 'Pairs' : 'Pairs (continued)',
+            value: pairsText
+          });
+          pairsText = pairLine;
+          fieldIndex++;
+        } else {
+          pairsText += pairLine;
+        }
       }
-      embed.addFields({ name: 'Pairs', value: pairsText });
+
+      // Add the last field
+      if (pairsText.length > 0) {
+        embed.addFields({
+          name: fieldIndex === 1 ? 'Pairs' : 'Pairs (continued)',
+          value: pairsText
+        });
+      }
 
       // Handle unpaired members
       if (unpaired.length > 0) {
